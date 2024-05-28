@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gestion de Contacts</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Ajouter un Contact</h1>
+        <form id="contactForm">
+            <div class="form-group">
+                <label for="name">Nom</label>
+                <input type="text" class="form-control" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Téléphone</label>
+                <input type="text" class="form-control" id="phone" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Ajouter</button>
+        </form>
+        <h2 class="mt-5">Contacts</h2>
+        <ul id="contactsList" class="list-group"></ul>
+    </div>
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            fetch('/contacts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, phone })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                fetchContacts();
+            });
+        });
+
+        function fetchContacts() {
+            fetch('/contacts')
+                .then(response => response.json())
+                .then(data => {
+                    const contactsList = document.getElementById('contactsList');
+                    contactsList.innerHTML = '';
+                    data.forEach(contact => {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item';
+                        li.textContent = `${contact.name} - ${contact.email} - ${contact.phone}`;
+                        contactsList.appendChild(li);
+                    });
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchContacts);
+    </script>
+</body>
+</html>
